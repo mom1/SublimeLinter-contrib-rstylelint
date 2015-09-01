@@ -1,0 +1,10 @@
+SublimeLinter-contrib-rstylelint
+-------------------------------
+This linter plugin for SublimeLinter provides an interface to rstylelint.
+
+** IMPORTANT! **
+
+Before this plugin will activate, you *must*
+follow the installation instructions here:
+
+https://github.com/MOM1/SublimeLinter-contrib-rstylelint

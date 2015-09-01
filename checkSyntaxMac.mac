@@ -1,0 +1,68 @@
+/***********************************************************
+FILE         :     checkSyntaxMac.mac
+COPYRIGHT    :     R-Style Software Lab. 2015
+DESCRIPTION  :     Macro 
+PROGRAMMED BY:     
+CREATION DATE:     
+Update       :
+************************************************************/
+cpwin;
+import rcw;
+import CoMainLite;
+
+var sFileLog         = "C:\\1.log";
+var sFileSyntax      ="";
+var sCmdArgs      = GetApplication.GetCmdArgs();
+var name;
+var ext;
+SplitFile ( sCmdArgs, name, ext);
+if (ext != ".mac") 
+   return;
+end;
+var ob               = CreateObject ("rcwhost","TRcwHost","MyInst",false);
+var m_axFSO:object   = GenObject("ActiveX\\Scripting.FileSystemObject");
+var m_axShell:object = GenObject("ActiveX\\WScript.Shell");
+
+
+if ((sCmdArgs == null) or (sCmdArgs == ""))
+    return
+end;
+sFileSyntax = name + ext;
+sFileLog    = m_axFSO.BuildPath(m_axFSO.GetSpecialFolder(2),sFileSyntax+".log");
+
+macro WriteFile(_sFileName:string, _sText:string):bool
+  var oTextStream:object;
+  var oFile:object;
+  var bRO:bool = false;
+  if(m_axFSO.FileExists(_sFileName))
+    oFile = m_axFSO.GetFile(_sFileName);
+    if(mod(oFile.Attributes,2))
+      bRO = true;
+      oFile.Attributes = oFile.Attributes - 1;
+    end;
+    oTextStream = oFile.OpenAsTextStream(2,0)
+  else
+    oTextStream = m_axFSO.CreateTextFile(_sFileName);
+  end;
+  oTextStream.Write(_sText);
+  if(bRO)
+    oFile.Attributes = oFile.Attributes + 1;
+  end;
+  return true;
+end;
+
+ob.AddModule (sFileSyntax);
+
+OnError (er)
+var count, i;
+var sMess="";
+sMess = sMess + er.message;
+if (IsEqClass ("TRsComErr", er.err))
+   count = er.err.Count;
+   i = 0;
+   while (i < count)
+      sMess = sMess + "\n"+er.err.Message (i) + " (Code = " + er.err.Code (i) + ", Level = " + er.err.Level (i) +")";
+      i = i + 1;
+   end;
+   WriteFile(sFileLog,sMess);
+end;
