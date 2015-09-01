@@ -1,8 +1,6 @@
 SublimeLinter-contrib-rstylelint
 ================================
 
-[![Build Status](https://travis-ci.org/SublimeLinter/SublimeLinter-contrib-rstylelint.svg?branch=master)](https://travis-ci.org/SublimeLinter/SublimeLinter-contrib-rstylelint)
-
 This linter plugin for [SublimeLinter][docs] provides an interface to [r-style][r-style]. It will be used with files that have the “RStyle” syntax.
 
 This plugin is for Windows operating systems only becuase the [r-style][r-style] linter is Windows only.
