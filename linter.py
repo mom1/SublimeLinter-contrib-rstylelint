@@ -14,7 +14,6 @@ from os.path import basename
 from SublimeLinter.lint import Linter, util
 
 
-
 class Rstylelint(Linter):
 
     """Provides an interface to rstylelint."""
@@ -26,7 +25,6 @@ class Rstylelint(Linter):
     tempfile_suffix = None
     re_flags = re.IGNORECASE
     error_stream = util.STREAM_STDOUT
-    
 
     def split_match(self, match):
             """Override to ignore errors reported in imported files."""
