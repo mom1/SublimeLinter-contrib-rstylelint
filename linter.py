@@ -14,6 +14,22 @@ import sublime
 from os.path import basename
 from SublimeLinter.lint import Linter, util
 
+def _make_text_safeish(text, method='decode'):
+    # The unicode decode here is because sublime converts to unicode inside
+    # insert in such a way that unknown characters will cause errors, which is
+    # distinctly non-ideal... and there's no way to tell what's coming out of
+    # git in output. So...
+    fallback_encoding = sublime.active_window().active_view().settings().get(
+        'fallback_encoding').rpartition('(')[2].rpartition(')')[0]
+    try:
+        unitext = getattr(text, method)('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        unitext = getattr(text, method)(fallback_encoding)
+    except AttributeError:
+        # strongly implies we're already unicode, but just in case let's cast
+        # to string
+        unitext = str(text)
+    return unitext
 
 class Rstylelint(Linter):
 
@@ -34,12 +50,17 @@ class Rstylelint(Linter):
             )
 
             folders = sublime.expand_variables("$folder", sublime.active_window().extract_variables())
-
+            project_data = sublime.active_window().project_data()
+            project_folder = [x['path'] for x in project_data['folders']]
+            
             match_filename = basename(match.groupdict()['filename'])
             linted_filename = basename(self.filename)
-            print(folders not in self.filename, match_filename != linted_filename, self.filename)
 
-            if match_filename != linted_filename or folders not in self.filename:
+            if match_filename != linted_filename:
+                print(_make_text_safeish("Ошибка в другом файле: " + match_filename))
+                return None, None, None, None, None, '', None
+            if len([i for i in project_folder if i in self.filename]) == 0:
+                print(_make_text_safeish("Файл не в проекте: " + linted_filename))
                 return None, None, None, None, None, '', None
 
             return match, line, col, error, warning, message, near
