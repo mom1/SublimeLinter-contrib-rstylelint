@@ -10,6 +10,7 @@
 
 """This module exports the Rstylelint plugin class."""
 import re
+import sublime
 from os.path import basename
 from SublimeLinter.lint import Linter, util
 
@@ -32,10 +33,13 @@ class Rstylelint(Linter):
                 super().split_match(match)
             )
 
+            folders = sublime.expand_variables("$folder", sublime.active_window().extract_variables())
+
             match_filename = basename(match.groupdict()['filename'])
             linted_filename = basename(self.filename)
+            print(folders not in self.filename, match_filename != linted_filename, self.filename)
 
-            if match_filename != linted_filename:
+            if match_filename != linted_filename or folders not in self.filename:
                 return None, None, None, None, None, '', None
 
             return match, line, col, error, warning, message, near
