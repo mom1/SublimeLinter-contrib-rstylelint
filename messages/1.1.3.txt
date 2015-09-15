@@ -1,0 +1,4 @@
+SublimeLinter-contrib-rstylelint 1.1.3
+---------------------------------------
+* No check files not in project
+* Add import "COMainLite" plese replace checkSyntaxMac.mac
