@@ -1,34 +1,36 @@
-/***********************************************************
-FILE         :     checkSyntaxMac.mac
-COPYRIGHT    :     R-Style Software Lab. 2015
-DESCRIPTION  :     Macro 
-PROGRAMMED BY:     
-CREATION DATE:     
-Update       :
-************************************************************/
+// FILE         :    checkSyntaxMac.mac
+// COPYRIGHT    :
+// DESCRIPTION  :    Анализ наличия ошибок в файле
+// PROGRAMMED BY:    MOM
+// CREATION DATE:    2015-09-01 23:52:52
+// LAST UPDATE  :    2016-05-21 23:53:28
 cpwin;
 import rcw;
 import CoMainLite;
+import CommonSetGlobals;
 
-var sFileLog         = "C:\\1.log";
-var sFileSyntax      ="";
-var sCmdArgs      = GetApplication.GetCmdArgs();
+var sFileLog = "C:\\1.log";
+var sFileSyntax ="";
+var sCmdArgs = GetApplication.GetCmdArgs();
 var name;
 var ext;
-SplitFile ( sCmdArgs, name, ext);
-if (ext != ".mac") 
-   return;
-end;
-var ob               = CreateObject ("rcwhost","TRcwHost","MyInst",false);
-var m_axFSO:object   = GenObject("ActiveX\\Scripting.FileSystemObject");
-var m_axShell:object = GenObject("ActiveX\\WScript.Shell");
-
 
 if ((sCmdArgs == null) or (sCmdArgs == ""))
     return
 end;
+
+SplitFile ( sCmdArgs, name, ext);
+
+if (ext != ".mac")
+   return;
+end;
+
+var ob = CreateObject ("rcwhost","TRcwHost","MyInst",false);
+var m_axFSO:object = GenObject("ActiveX\\Scripting.FileSystemObject");
+// var m_axShell:object = GenObject("ActiveX\\WScript.Shell");
+
 sFileSyntax = name + ext;
-sFileLog    = m_axFSO.BuildPath(m_axFSO.GetSpecialFolder(2),sFileSyntax+".log");
+sFileLog = m_axFSO.BuildPath(m_axFSO.GetSpecialFolder(2),sFileSyntax+".log");
 
 macro WriteFile(_sFileName:string, _sText:string):bool
   var oTextStream:object;
@@ -50,6 +52,27 @@ macro WriteFile(_sFileName:string, _sText:string):bool
   end;
   return true;
 end;
+
+// Логин и пароль пользователя
+var UserName = "admin";  //указать Логин
+var Password = "";  //указать Пароль
+var Server = "";    //указать сервер
+
+// Соединяемся
+var oConn = GenObject("ActiveX\\RSComProvider.RSCOMConnection");
+if (Not oConn.IsConnected)
+  oConn.UserName = UserName;
+  oConn.Password = Password;
+  oConn.Server = Server;
+  oConn.Connect();
+  if (Not oConn.IsConnected)
+    WriteFile(sFileLog,"Нет соединения с сервером приложения");
+    return;
+  end;
+end;
+
+OnClientSettingsChanged();
+GetHelperFuncsObject();
 
 if (ob.AddModule ("COMainLite"))
   ob.Execute;

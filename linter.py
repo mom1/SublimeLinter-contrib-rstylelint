@@ -14,6 +14,7 @@ import sublime
 from os.path import basename
 from SublimeLinter.lint import Linter, util
 
+
 def _make_text_safeish(text, method='decode'):
     # The unicode decode here is because sublime converts to unicode inside
     # insert in such a way that unknown characters will cause errors, which is
@@ -31,36 +32,48 @@ def _make_text_safeish(text, method='decode'):
         unitext = str(text)
     return unitext
 
+
 class Rstylelint(Linter):
 
     """Provides an interface to rstylelint."""
     syntax = 'r-style'
     cmd = ('checkSyntaxMac.cmd', '@')
-    regex = (r'(?ix)(?P<filename>.+\.mac)\((?P<line>\d+),(?P<col>\d+)\):\s*\w*\s*\d*\:\s*(?P<message>.+[^\(Code]\n)*')
+    regex = (
+        r'(?ix)(?P<filename>.+\.mac)\((?P<line>\d+),(?P<col>\d+)\):\s*\w*\s*\d*\:\s*(?P<message>.+[^\(Code]\n)*')
+    fail_connect = re.compile(r'(?is).*(Нет соединения с сервером приложения).*')
     multiline = True
     line_col_base = (1, 1)
     tempfile_suffix = None
     re_flags = re.IGNORECASE
     error_stream = util.STREAM_STDOUT
 
+    def find_errors(self, output):
+        ou = output.strip('\r\n')
+        match = self.fail_connect.match(ou)
+
+        if match:
+            sublime.status_message(_make_text_safeish(match.group(1)))
+            print(match.group(1))
+        return super().find_errors(output)
+
     def split_match(self, match):
-            """Override to ignore errors reported in imported files."""
-            match, line, col, error, warning, message, near = (
-                super().split_match(match)
-            )
+        """Override to ignore errors reported in imported files."""
+        match, line, col, error, warning, message, near = (
+            super().split_match(match)
+        )
+        print(match)
+        folders = sublime.expand_variables("$folder", sublime.active_window().extract_variables())
+        project_data = sublime.active_window().project_data()
+        project_folder = [x['path'] for x in project_data['folders']]
 
-            folders = sublime.expand_variables("$folder", sublime.active_window().extract_variables())
-            project_data = sublime.active_window().project_data()
-            project_folder = [x['path'] for x in project_data['folders']]
-            
-            match_filename = basename(match.groupdict()['filename'])
-            linted_filename = basename(self.filename)
+        match_filename = basename(match.groupdict()['filename'])
+        linted_filename = basename(self.filename)
 
-            if match_filename != linted_filename:
-                print(_make_text_safeish("Ошибка в другом файле: " + match_filename))
-                return None, None, None, None, None, '', None
-            if len([i for i in project_folder if i in self.filename]) == 0:
-                print(_make_text_safeish("Файл не в проекте: " + linted_filename))
-                return None, None, None, None, None, '', None
+        if match_filename != linted_filename:
+            sublime.status_message(_make_text_safeish("Ошибка в другом файле: " + match_filename))
+            return None, None, None, None, None, '', None
+        if len([i for i in project_folder if i in self.filename]) == 0:
+            sublime.status_message(_make_text_safeish("Файл не в проекте: " + linted_filename))
+            return None, None, None, None, None, '', None
 
-            return match, line, col, error, warning, message, near
+        return match, line, col, error, warning, message, near
