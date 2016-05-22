@@ -1,7 +1,7 @@
 # @Author: MOM
 # @Date:   2015-08-31 23:02:37
 # @Last Modified by:   MOM
-# @Last Modified time: 2016-05-22 01:31:58
+# @Last Modified time: 2016-05-22 03:24:44
 #
 # linter.py
 # Linter for SublimeLinter3, a code checking framework for Sublime Text 3
@@ -73,9 +73,11 @@ class Rstylelint(Linter):
 
         if match_filename != linted_filename:
             sublime.status_message(_make_text_safeish("Ошибка в другом файле: " + match_filename))
+            print(_make_text_safeish("Ошибка в другом файле: " + match_filename))
             return None, None, None, None, None, '', None
         if len([i for i in project_folder if i in self.filename]) == 0:
             sublime.status_message(_make_text_safeish("Файл не в проекте: " + linted_filename))
+            print(_make_text_safeish("Файл не в проекте: " + linted_filename))
             return None, None, None, None, None, '', None
 
         return match, line, col, error, warning, message, near
