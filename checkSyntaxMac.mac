@@ -3,7 +3,7 @@
 // DESCRIPTION  :    Анализ наличия ошибок в файле
 // PROGRAMMED BY:    MOM
 // CREATION DATE:    2015-09-01 23:52:52
-// LAST UPDATE  :    2016-05-21 23:53:28
+// LAST UPDATE  :    2016-05-22 01:18:42
 cpwin;
 import rcw;
 import CoMainLite;
@@ -16,7 +16,7 @@ var name;
 var ext;
 
 if ((sCmdArgs == null) or (sCmdArgs == ""))
-    return
+    return;
 end;
 
 SplitFile ( sCmdArgs, name, ext);

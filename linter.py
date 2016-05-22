@@ -1,10 +1,13 @@
+# @Author: MOM
+# @Date:   2015-08-31 23:02:37
+# @Last Modified by:   MOM
+# @Last Modified time: 2016-05-22 01:31:58
 #
 # linter.py
 # Linter for SublimeLinter3, a code checking framework for Sublime Text 3
 #
 # Written by MOM
 # Copyright (c) 2015 MOM
-#
 # License: MIT
 #
 
@@ -61,7 +64,6 @@ class Rstylelint(Linter):
         match, line, col, error, warning, message, near = (
             super().split_match(match)
         )
-        print(match)
         folders = sublime.expand_variables("$folder", sublime.active_window().extract_variables())
         project_data = sublime.active_window().project_data()
         project_folder = [x['path'] for x in project_data['folders']]
