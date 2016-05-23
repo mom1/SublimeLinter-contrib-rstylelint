@@ -1,7 +1,7 @@
 # @Author: MOM
 # @Date:   2015-08-31 23:02:37
-# @Last Modified by:   MOM
-# @Last Modified time: 2016-05-22 03:24:44
+# @Last Modified by:   maximus
+# @Last Modified time: 2016-05-23 12:15:40
 #
 # linter.py
 # Linter for SublimeLinter3, a code checking framework for Sublime Text 3
@@ -14,6 +14,7 @@
 """This module exports the Rstylelint plugin class."""
 import re
 import sublime
+import os
 from os.path import basename
 from SublimeLinter.lint import Linter, util
 
@@ -40,7 +41,8 @@ class Rstylelint(Linter):
 
     """Provides an interface to rstylelint."""
     syntax = 'r-style'
-    cmd = ('checkSyntaxMac.cmd', '@')
+    checkfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'checkSyntaxMac.cmd')
+    cmd = (checkfile, '@')
     regex = (
         r'(?ix)(?P<filename>.+\.mac)\((?P<line>\d+),(?P<col>\d+)\):\s*\w*\s*\d*\:\s*(?P<message>.+[^\(Code]\n)*')
     fail_connect = re.compile(r'(?is).*(Нет соединения с сервером приложения).*')
